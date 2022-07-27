@@ -2,18 +2,21 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+# Это значит, что параметр language обязателен для запуска данного теста
 def pytest_addoption(parser):
-    parser.addoption('--language', action='store', default="ru", help='Choose language')
+    parser.addoption('--language', action='store', default=None,
+                     help="Choose language please")
 
-
+# Это фикстура в которой открывается браузер с учетом языка, который ввел пользователь
 @pytest.fixture(scope="function")
-def driver(request):
-
-    driver_language = request.config.getoption("language")
+def browser(request):
+    print("\nstart chrome browser for test..")
+    # Получаем значение параметра language из командной строки
+    user_language = request.config.getoption("language")
     options = Options()
-    options.add_experimental_option('prefs', {'intl.accept_languages': driver_language})
-    driver = webdriver.Chrome(executable_path=r"D:\stepik_selenium_course\chromeDriver\chromedriver.exe", options=options)
-
-    yield driver
+    # Запускаем браузер с языком, который выбрали
+    options.add_experimental_option('prefs', {'intl.accept_languages': user_language})
+    browser = webdriver.Chrome(options=options)
+    yield browser
     print("\nquit browser..")
-    driver.close()
+    browser.quit()
